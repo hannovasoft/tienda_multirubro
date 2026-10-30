@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Administración</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 1. PANTALLA DE LOGIN -->
+  <div class="container d-flex justify-content-center align-items-center vh-100" id="loginScreen">
+    <div class="card shadow-sm border p-4 rounded-4" style="max-width: 380px; width: 100%;">
+      <div class="text-center mb-3">
+        <i class="bi bi-sliders2-vertical fs-1 text-primary"></i>
+        <h4 class="fw-bold mt-2">Panel de Control</h4>
+        <p class="text-muted small mb-0" id="loginHint">Clave por defecto: <strong>admin123</strong></p>
+      </div>
+      <input type="password" id="adminPasswordInput" class="form-control mb-3" placeholder="Contraseña">
+      <button class="btn btn-primary w-100 fw-semibold py-2" id="btnLogin">Ingresar</button>
+      <a href="index.html" class="btn btn-link w-100 mt-2 text-decoration-none small text-muted">← Volver a la tienda</a>
+    </div>
+  </div>
+
+  <!-- 2. DASHBOARD PRINCIPAL -->
+  <div id="adminDashboard" class="d-none">
+    <!-- Barra Superior con Botón para Reabrir el Asistente de Rubros -->
+    <nav class="navbar navbar-dark bg-dark sticky-top py-2 shadow-sm">
+      <div class="container d-flex justify-content-between align-items-center">
+        <span class="navbar-brand fw-bold fs-6 mb-0">
+          <i class="bi bi-grid-fill me-1 text-primary"></i> Mi Tienda
+        </span>
+        <div class="d-flex gap-2">
+          <!-- Botón para volver a abrir el cartel de Rubros en cualquier momento -->
+          <button class="btn btn-sm btn-warning fw-bold rounded-pill px-3" onclick="openIndustryWizard()">
+            <i class="bi bi-magic me-1"></i> Rubros
+          </button>
+          <a href="index.html" class="btn btn-sm btn-outline-light rounded-pill px-3" target="_blank">
+            <i class="bi bi-eye"></i> <span class="d-none d-sm-inline ms-1">Tienda</span>
+          </a>
+          <button class="btn btn-sm btn-danger rounded-pill px-2" id="btnLogout" title="Salir">
+            <i class="bi bi-power"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container my-3">
+
+      <!-- RESUMEN DEL MES (se ve en todas las pestañas) -->
+      <section id="statsPanel" class="mb-3">
+        <div class="row g-2 text-center">
+          <div class="col-12 col-md-4">
+            <div class="bg-white border rounded-4 p-2 shadow-sm h-100">
+              <div class="text-muted" style="font-size:0.7rem;">VENTAS DEL MES</div>
+              <div class="fw-extrabold fs-4 text-success" id="statMonthSales">$0</div>
+              <div class="text-muted" style="font-size:0.66rem;">Pedidos entregados</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="bg-white border rounded-4 p-2 shadow-sm h-100">
+              <div class="text-muted" style="font-size:0.7rem;">PEDIDOS DEL MES</div>
+              <div class="fw-extrabold fs-4 text-primary" id="statMonthOrders">0</div>
+              <div class="text-muted" style="font-size:0.66rem;">Sin contar cancelados</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="bg-white border rounded-4 p-2 shadow-sm h-100">
+              <div class="text-muted" style="font-size:0.7rem;">MÁS VENDIDO</div>
+              <div class="fw-bold text-truncate" id="statTopProduct" style="font-size:0.95rem;">Sin ventas</div>
+              <div class="text-muted" style="font-size:0.66rem;" id="statTopProductUnits">Todavía no hay pedidos este mes</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           PESTAÑA 1: INVENTARIO, BUSCADOR Y AUMENTO MASIVO
+           ==================================================================== -->
+      <section id="tabProducts">
+        <div class="row g-2 mb-3 text-center">
+          <div class="col-4">
+            <div class="bg-white border rounded-4 p-2 shadow-sm">
+              <div class="text-muted" style="font-size:0.7rem;">PRODUCTOS</div>
+              <div class="fw-extrabold fs-5" id="statTotalProducts">0</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="bg-white border rounded-4 p-2 shadow-sm">
+              <div class="text-muted" style="font-size:0.7rem;">SIN STOCK</div>
+              <div class="fw-extrabold fs-5 text-danger" id="statOutStock">0</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="bg-white border rounded-4 p-2 shadow-sm">
+              <div class="text-muted" style="font-size:0.7rem;">PEDIDOS</div>
+              <div class="fw-extrabold fs-5 text-primary" id="statPendingOrders">0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mb-3">
+          <button class="btn btn-primary flex-grow-1 fw-bold rounded-3 py-2 shadow-sm" onclick="openProductModal()">
+            <i class="bi bi-plus-circle me-1"></i> Cargar Producto
+          </button>
+          <button class="btn btn-outline-dark fw-semibold rounded-3 px-3" data-bs-toggle="collapse" data-bs-target="#bulkPriceCollapse">
+            <i class="bi bi-percent"></i> Aumento %
+          </button>
+          <button type="button" class="help-icon-btn align-self-center" onclick="showHelp('Aumento Masivo por %', 'Te permite subir o bajar todos los precios de tu tienda o de una categoría entera al mismo tiempo sin editar producto por producto.')">?</button>
+        </div>
+
+        <!-- Caja Desplegable: Aumento Masivo -->
+        <div class="collapse mb-3" id="bulkPriceCollapse">
+          <div class="card border-primary bg-primary bg-opacity-10 rounded-4 p-3">
+            <h6 class="fw-bold small mb-2">Actualizar precios por porcentaje</h6>
+            <div class="row g-2 align-items-center">
+              <div class="col-5">
+                <select id="bulkCategorySelect" class="form-select form-select-sm"></select>
+              </div>
+              <div class="col-4">
+                <div class="input-group input-group-sm">
+                  <input type="number" id="bulkPercentInput" class="form-control" placeholder="Ej: 15">
+                  <span class="input-group-text">%</span>
+                </div>
+              </div>
+              <div class="col-3">
+                <button class="btn btn-sm btn-primary w-100 fw-bold" id="btnApplyBulkPrice">Aplicar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Buscador Interno del Dueño -->
+        <div class="input-group mb-3 shadow-sm">
+          <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" id="adminSearchInput" class="form-control border-start-0" placeholder="Buscar producto por nombre o categoría...">
+        </div>
+
+        <div class="d-flex flex-column gap-2" id="adminProductsList"></div>
+      </section>
+
+      <!-- ====================================================================
+           PESTAÑA 2: PEDIDOS RECIBIDOS
+           ==================================================================== -->
+      <section id="tabOrders" class="d-none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">
+            Pedidos Recibidos
+            <button type="button" class="help-icon-btn" onclick="showHelp('Control de Pedidos y Stock', 'Cada vez que un cliente envía un pedido desde la web, queda anotado acá. Cuando toques el botón verde Marcar Entregado, el sistema descontará automáticamente las unidades del stock.')">?</button>
+          </h5>
+        </div>
+        <div class="d-flex flex-column gap-3" id="adminOrdersList"></div>
+      </section>
+
+      <!-- ====================================================================
+           PESTAÑA 3: CONFIGURACIÓN TOTAL DE LA TIENDA
+           ==================================================================== -->
+      <section id="tabSettings" class="d-none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0">Personalizar Tienda</h5>
+          <button type="button" class="btn btn-sm btn-warning fw-bold rounded-pill" onclick="openIndustryWizard()">
+            <i class="bi bi-magic me-1"></i> Abrir Asistente de Rubro
+          </button>
+        </div>
+
+        <form id="settingsForm">
+          <div class="accordion shadow-sm rounded-4 overflow-hidden mb-3" id="settingsAccordion">
+            
+            <!-- 1. Identidad, Color y Portada -->
+            <div class="accordion-item border-0 border-bottom">
+              <h2 class="accordion-header">
+                <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accBrand">
+                  <i class="bi bi-palette me-2 text-primary"></i> 1. Marca, Color y Portada
+                </button>
+              </h2>
+              <div id="accBrand" class="accordion-collapse collapse show" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold">Nombre del Comercio</label>
+                    <input type="text" id="confName" class="form-control form-control-sm" required>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold">Eslogan o Subtítulo</label>
+                    <input type="text" id="confSlogan" class="form-control form-control-sm" required>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold">
+                      Texto Barra Superior de Anuncio
+                      <button type="button" class="help-icon-btn" onclick="showHelp('Barra de Anuncio', 'Es la franja negra arriba de todo en la tienda. Ideal para anunciar envíos gratis, promociones o descuentos.')">?</button>
+                    </label>
+                    <input type="text" id="confAnnouncement" class="form-control form-control-sm">
+                  </div>
+                  <div class="row mb-2">
+                    <div class="col-8">
+                      <label class="form-label small fw-semibold">
+                        WhatsApp (con cód. de país)
+                        <button type="button" class="help-icon-btn" onclick="showHelp('Número de WhatsApp', 'Escribí tu número todo junto sin el signo + ni espacios. Ejemplo para Argentina: 5491122334455.')">?</button>
+                      </label>
+                      <input type="text" id="confWhatsapp" class="form-control form-control-sm" required>
+                    </div>
+                    <div class="col-4">
+                      <label class="form-label small fw-semibold">Color Marca</label>
+                      <input type="color" id="confColor" class="form-control form-control-color form-control-sm w-100">
+                    </div>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold">Subir Foto de Portada (Banner)</label>
+                    <input type="file" id="confBannerFile" class="form-control form-control-sm" accept="image/*">
+                    <input type="hidden" id="confBannerUrl">
+                  </div>
+                  <div class="row g-2 mb-2">
+                    <div class="col-4">
+                      <label class="form-label small fw-semibold">Moneda</label>
+                      <input type="text" id="confCurrency" class="form-control form-control-sm" maxlength="4" placeholder="$">
+                    </div>
+                    <div class="col-8">
+                      <label class="form-label small fw-semibold">Logo (opcional)</label>
+                      <input type="file" id="confLogoFile" class="form-control form-control-sm" accept="image/*">
+                      <input type="hidden" id="confLogoUrl">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Categorías Editables Manualmente -->
+            <div class="accordion-item border-0 border-bottom">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accCats">
+                  <i class="bi bi-tags me-2 text-primary"></i> 2. Categorías (Edición Libre)
+                </button>
+              </h2>
+              <div id="accCats" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                  <label class="form-label small fw-semibold">
+                    Categorías de tu tienda (separadas por coma)
+                    <button type="button" class="help-icon-btn" onclick="showHelp('Categorías Personalizadas', 'Podés agregar, borrar o cambiar el orden de tus categorías separándolas con una coma. Se convertirán automáticamente en botones en tu tienda.')">?</button>
+                  </label>
+                  <textarea id="confCategories" class="form-control form-control-sm" rows="2" required></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Mercado Pago, Cupones y Envíos -->
+            <div class="accordion-item border-0 border-bottom">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accPayments">
+                  <i class="bi bi-credit-card me-2 text-primary"></i> 3. Mercado Pago, Cupones y Envíos
+                </button>
+              </h2>
+              <div id="accPayments" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="confMpEnabled">
+                    <label class="form-check-label small fw-bold">Habilitar botón de Mercado Pago en el carrito</label>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">
+                      Tu Alias o Link de Cobro de Mercado Pago
+                      <button type="button" class="help-icon-btn" onclick="showHelp('Cobro con Mercado Pago', 'Podés escribir tu Alias (ej: mitienda.mp) para que al cliente se le copie automáticamente al pagar, o pegar un link de pago (https://mpago.la/...).')">?</button>
+                    </label>
+                    <input type="text" id="confMpAlias" class="form-control form-control-sm" placeholder="Ej: mitienda.mp o https://mpago.la/...">
+                  </div>
+                  <hr>
+                  <div class="row g-2 mb-3">
+                    <div class="col-7">
+                      <label class="form-label small fw-semibold">
+                        Código de Cupón Promocional
+                        <button type="button" class="help-icon-btn" onclick="showHelp('Cupones de Descuento', 'Creá una palabra clave (ej: PROMO10) y compartila en tus redes. Los clientes que la ingresen en el carrito recibirán el descuento.')">?</button>
+                      </label>
+                      <input type="text" id="confCouponCode" class="form-control form-control-sm text-uppercase" placeholder="Ej: BIENVENIDA10">
+                    </div>
+                    <div class="col-5">
+                      <label class="form-label small fw-semibold">% Descuento Cupón</label>
+                      <input type="number" id="confCouponPercent" class="form-control form-control-sm" min="0" max="90">
+                    </div>
+                  </div>
+                  <div class="row g-2">
+                    <div class="col-4">
+                      <label class="form-label small fw-semibold">Costo Envío ($)</label>
+                      <input type="number" id="confShippingCost" class="form-control form-control-sm" min="0">
+                    </div>
+                    <div class="col-4">
+                      <label class="form-label small fw-semibold">Gratis desde ($)</label>
+                      <input type="number" id="confFreeThreshold" class="form-control form-control-sm" min="0">
+                    </div>
+                    <div class="col-4">
+                      <label class="form-label small fw-semibold">% Off Efectivo/Transf.</label>
+                      <input type="number" id="confDiscountPercent" class="form-control form-control-sm" min="0" max="90">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Pie de Página (Contacto, Horarios y Redes) -->
+            <div class="accordion-item border-0 border-bottom">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accFooter">
+                  <i class="bi bi-info-circle me-2 text-primary"></i> 4. Pie de Página, Horarios y Contacto
+                </button>
+              </h2>
+              <div id="accFooter" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="confStoreOpen">
+                    <label class="form-check-label small fw-bold">Mostrar cartel "🟢 Local Abierto" (Desactivar si está cerrado)</label>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold">Texto "Sobre Nosotros"</label>
+                    <textarea id="confAboutUs" class="form-control form-control-sm" rows="2"></textarea>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold">Dirección o Zona de Entrega</label>
+                    <input type="text" id="confAddress" class="form-control form-control-sm">
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold">Horarios de Atención</label>
+                    <input type="text" id="confHours" class="form-control form-control-sm">
+                  </div>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label class="form-label small fw-semibold">Link de Instagram</label>
+                      <input type="text" id="confInstagram" class="form-control form-control-sm" placeholder="https://instagram.com/...">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small fw-semibold">Link de Facebook</label>
+                      <input type="text" id="confFacebook" class="form-control form-control-sm" placeholder="https://facebook.com/...">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. Medios de pago y entrega -->
+            <div class="accordion-item border-0 border-bottom">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accDelivery">
+                  <i class="bi bi-truck me-2 text-primary"></i> 5. Medios de Pago y Entrega
+                </button>
+              </h2>
+              <div id="accDelivery" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="confCoordinateMode">
+                    <label class="form-check-label small fw-bold">
+                      Modo "todo a coordinar por WhatsApp"
+                      <button type="button" class="help-icon-btn" onclick="showHelp('Todo a coordinar por WhatsApp', 'Si lo activás, la tienda no calcula descuentos, cupones ni costo de envío. El cliente arma su pedido y el pago y la entrega se acuerdan con vos por WhatsApp. Es la opción más simple y segura para empezar.')">?</button>
+                    </label>
+                  </div>
+                  <hr class="my-2">
+                  <p class="small text-muted mb-1">Mercado Pago se activa en la sección 3.</p>
+                  <div class="form-check form-switch mb-1">
+                    <input class="form-check-input" type="checkbox" id="confPayCash">
+                    <label class="form-check-label small fw-semibold">Aceptar pago en efectivo</label>
+                  </div>
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="confPayTransfer">
+                    <label class="form-check-label small fw-semibold">Aceptar pago por transferencia</label>
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label small fw-semibold">Datos para transferir (titular, CBU/CVU, alias)</label>
+                    <textarea id="confTransferDetails" class="form-control form-control-sm" rows="3" placeholder="Titular: ...&#10;Alias: ..."></textarea>
+                  </div>
+                  <div class="form-check form-switch mb-1">
+                    <input class="form-check-input" type="checkbox" id="confPickupEnabled">
+                    <label class="form-check-label small fw-semibold">Ofrecer retiro en el local</label>
+                  </div>
+                  <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" id="confDeliveryEnabled">
+                    <label class="form-check-label small fw-semibold">Ofrecer envío a domicilio</label>
+                  </div>
+                  <div class="mb-1">
+                    <label class="form-label small fw-semibold">
+                      Zonas de envío con precio (opcional)
+                      <button type="button" class="help-icon-btn" onclick="showHelp('Zonas de envío', 'Escribí una zona por línea con su precio, así: Laferrere = 2000. Si completás esto, el cliente elige su zona y el envío usa ese precio. Si lo dejás vacío se usa el costo único de la sección 3.')">?</button>
+                    </label>
+                    <textarea id="confShippingZones" class="form-control form-control-sm" rows="4" placeholder="Laferrere = 2000&#10;Ramos Mejía = 3500"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 6. Fechas y condiciones de las ofertas -->
+            <div class="accordion-item border-0 border-bottom">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accOffers">
+                  <i class="bi bi-calendar-check me-2 text-primary"></i> 6. Fechas de Ofertas
+                </button>
+              </h2>
+              <div id="accOffers" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                  <p class="small text-muted mb-2">
+                    Una oferta debe indicar desde cuándo y hasta cuándo rige. Si dejás una fecha vacía, esa oferta no tiene límite en ese extremo.
+                    <button type="button" class="help-icon-btn" onclick="showHelp('Fechas de ofertas', 'Fuera de las fechas que cargues, el cupón o el descuento deja de aplicarse solo. Recordá que una oferta publicada obliga al vendedor a cumplirla mientras esté vigente.')">?</button>
+                  </p>
+                  <label class="form-label small fw-bold mb-1">Cupón</label>
+                  <div class="row g-2 mb-3">
+                    <div class="col-4">
+                      <label class="form-label small mb-0">Desde</label>
+                      <input type="date" id="confCouponStart" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-4">
+                      <label class="form-label small mb-0">Hasta</label>
+                      <input type="date" id="confCouponEnd" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-4">
+                      <label class="form-label small mb-0">Compra mín. ($)</label>
+                      <input type="number" id="confCouponMin" class="form-control form-control-sm" min="0">
+                    </div>
+                  </div>
+                  <label class="form-label small fw-bold mb-1">Descuento por pagar en efectivo o transferencia</label>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label class="form-label small mb-0">Desde</label>
+                      <input type="date" id="confDiscountStart" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small mb-0">Hasta</label>
+                      <input type="date" id="confDiscountEnd" class="form-control form-control-sm">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7. Tarjetas de beneficios -->
+            <div class="accordion-item border-0 border-bottom">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accBenefits">
+                  <i class="bi bi-stars me-2 text-primary"></i> 7. Tarjetas de Beneficios
+                </button>
+              </h2>
+              <div id="accBenefits" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                  <p class="small text-muted mb-2">Son los 3 recuadros que aparecen debajo del banner. Escribí solo lo que tu negocio realmente ofrece.</p>
+                  <div class="row g-2 mb-2">
+                    <div class="col-5"><input type="text" id="confBenefit1Title" class="form-control form-control-sm" placeholder="Título 1"></div>
+                    <div class="col-7"><input type="text" id="confBenefit1Desc" class="form-control form-control-sm" placeholder="Descripción 1"></div>
+                  </div>
+                  <div class="row g-2 mb-2">
+                    <div class="col-5"><input type="text" id="confBenefit2Title" class="form-control form-control-sm" placeholder="Título 2"></div>
+                    <div class="col-7"><input type="text" id="confBenefit2Desc" class="form-control form-control-sm" placeholder="Descripción 2"></div>
+                  </div>
+                  <div class="row g-2">
+                    <div class="col-5"><input type="text" id="confBenefit3Title" class="form-control form-control-sm" placeholder="Título 3"></div>
+                    <div class="col-7"><input type="text" id="confBenefit3Desc" class="form-control form-control-sm" placeholder="Descripción 3"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 8. Datos del vendedor y legales -->
+            <div class="accordion-item border-0 border-bottom">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accLegal">
+                  <i class="bi bi-shield-check me-2 text-primary"></i> 8. Datos del Vendedor y Legales
+                </button>
+              </h2>
+              <div id="accLegal" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                  <p class="small text-muted mb-2">
+                    Estos datos aparecen al pie de la tienda junto con los términos y el botón de arrepentimiento.
+                    <button type="button" class="help-icon-btn" onclick="showHelp('Datos legales', 'La ley exige que una tienda online muestre quién vende y sus condiciones. Cargá tus datos reales y pedile a tu contador o abogado que revise los términos y condiciones.')">?</button>
+                  </p>
+                  <div class="row g-2 mb-2">
+                    <div class="col-7">
+                      <label class="form-label small fw-semibold">Nombre o razón social</label>
+                      <input type="text" id="confSellerName" class="form-control form-control-sm">
+                    </div>
+                    <div class="col-5">
+                      <label class="form-label small fw-semibold">CUIT</label>
+                      <input type="text" id="confSellerTaxId" class="form-control form-control-sm" placeholder="20-12345678-9">
+                    </div>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small fw-semibold">Email de contacto</label>
+                    <input type="email" id="confSellerEmail" class="form-control form-control-sm">
+                  </div>
+                  <div class="mb-1">
+                    <label class="form-label small fw-semibold">Términos y condiciones (si lo dejás vacío se muestra un texto base)</label>
+                    <textarea id="confTermsText" class="form-control form-control-sm" rows="6"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 9. Estilo visual y productos -->
+            <div class="accordion-item border-0">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#accStyle">
+                  <i class="bi bi-palette me-2 text-primary"></i> 9. Estilo Visual y Productos
+                </button>
+              </h2>
+              <div id="accStyle" class="accordion-collapse collapse" data-bs-parent="#settingsAccordion">
+                <div class="accordion-body">
+                  <label class="form-label small fw-semibold">Tipografía de la tienda</label>
+                  <select id="confFontStyle" class="form-select form-select-sm mb-2">
+                    <option value="moderno">Moderno</option>
+                    <option value="elegante">Elegante</option>
+                    <option value="minimalista">Minimalista</option>
+                  </select>
+                  <div class="border rounded-3 p-2 mb-3 bg-light">
+                    <div id="fontPreviewTitle" class="fs-5 fw-bold">Título de ejemplo</div>
+                    <div id="fontPreviewText" class="small">Así se verá el texto de tu tienda.</div>
+                  </div>
+
+                  <label class="form-label small fw-semibold">Ícono del carrito y de los botones</label>
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <select id="confCartIcon" class="form-select form-select-sm"></select>
+                    <span id="cartIconPreview" class="fs-4 text-primary"></span>
+                  </div>
+                  <p class="small text-muted mb-3">Las opciones cambian según el rubro de tu tienda.</p>
+
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="confVariantsEnabled">
+                    <label class="form-check-label small fw-semibold">
+                      Mi tienda maneja talles y colores con stock
+                      <button type="button" class="help-icon-btn" onclick="showHelp('Talles y colores', 'Si lo activás, al cargar un producto vas a poder definir el stock de cada talle y color por separado. Si lo desactivás, cada producto tiene un único stock general.')">?</button>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100 fw-bold py-2 rounded-3 shadow-sm" id="btnSaveConfig">
+            <i class="bi bi-check2-circle me-1"></i> Guardar Todos los Cambios
+          </button>
+        </form>
+      </section>
+
+    </div>
+
+    <!-- BARRA DE NAVEGACIÓN INFERIOR -->
+    <nav class="admin-bottom-nav">
+      <button class="admin-nav-btn active" onclick="switchAdminTab('tabProducts', this)">
+        <i class="bi bi-box-seam"></i>
+        <span>Inventario</span>
+      </button>
+      <button class="admin-nav-btn" onclick="switchAdminTab('tabOrders', this)">
+        <i class="bi bi-receipt"></i>
+        <span>Pedidos</span>
+      </button>
+      <button class="admin-nav-btn" onclick="switchAdminTab('tabSettings', this)">
+        <i class="bi bi-gear"></i>
+        <span>Tienda</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ======================================================================
+       3. MODAL ASISTENTE INTELIGENTE DE 14 RUBROS (ONBOARDING WIZARD)
+       ====================================================================== -->
+  <div class="modal fade" id="industryWizardModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white py-3">
+          <div>
+            <h5 class="modal-title fw-bold mb-0"><i class="bi bi-magic me-2 text-warning"></i>Asistente Inteligente de Rubros</h5>
+            <small class="text-light opacity-75">Configurá tu tienda en segundos o editá todo manualmente a tu gusto</small>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-3 p-md-4">
+          
+          <!-- Buscador de Rubros en vivo -->
+          <div class="input-group mb-3">
+            <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+            <input type="text" id="wizardSearchInput" class="form-control bg-light" placeholder="Buscar tu rubro (ej: natación, suplementos, limpieza, pizzería, ropa)...">
+          </div>
+
+          <!-- Paso 1: Grilla de los 14 Macro-Rubros -->
+          <label class="form-label small fw-bold text-uppercase text-muted mb-2">1. Elegí el universo principal de tu negocio:</label>
+          <div class="row row-cols-2 row-cols-md-3 g-2 mb-4" id="wizardMacrosGrid"></div>
+
+          <!-- Paso 2: Sub-especialidades tildables y Edición Manual -->
+          <div id="wizardStep2Section" class="bg-light p-3 rounded-4 border">
+            <label class="form-label small fw-bold text-uppercase text-primary mb-2">
+              2. Tildá qué especialidades vendés (podés marcar varias):
+            </label>
+            <div class="row g-2 mb-3" id="wizardSubcatsCheckboxes"></div>
+
+            <label class="form-label small fw-bold mb-1">
+              3. Revisá o modificá las categorías a tu antojo (separadas por coma):
+              <button type="button" class="help-icon-btn" onclick="showHelp('Edición Libre', 'Al tildar las casillas de arriba se llena esta caja sola, pero podés escribir, borrar o agregar cualquier categoría manualmente antes de aplicar.')">?</button>
+            </label>
+            <textarea id="wizardCustomCategories" class="form-control form-control-sm mb-2" rows="2"></textarea>
+            <div class="d-flex align-items-center gap-2 small text-muted">
+              <span>Color sugerido para este rubro:</span>
+              <input type="color" id="wizardColorPicker" class="form-control form-control-color form-control-sm">
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer d-flex justify-content-between bg-light">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-3" id="btnSkipWizard">
+            Omitir por ahora (Configurar manual)
+          </button>
+          <button type="button" class="btn btn-primary fw-bold rounded-pill px-4" id="btnApplyWizard">
+            <i class="bi bi-check2-all me-1"></i> Aplicar Configuración a mi Tienda
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MODAL PARA CREAR / EDITAR PRODUCTO -->
+  <div class="modal fade" id="productModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0">
+        <form id="productForm">
+          <div class="modal-header py-2">
+            <h6 class="modal-title fw-bold" id="modalTitle">Producto</h6>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="prodId">
+            <div class="mb-2">
+              <label class="form-label small fw-semibold mb-1">Nombre del Producto</label>
+              <input type="text" id="prodTitle" class="form-control form-control-sm" required>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label small fw-semibold mb-1">Categoría</label>
+                <select id="prodCategory" class="form-select form-select-sm" required></select>
+              </div>
+              <div class="col-6" id="stockCol">
+                <label class="form-label small fw-semibold mb-1">Stock Disponible</label>
+                <input type="number" id="prodStock" class="form-control form-control-sm" min="0" required>
+              </div>
+            </div>
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label small fw-semibold mb-1">Precio de Venta ($)</label>
+                <input type="number" id="prodPrice" class="form-control form-control-sm" min="0" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small fw-semibold mb-1">
+                  Precio Anterior ($)
+                  <button type="button" class="help-icon-btn" onclick="showHelp('Precio Tachado / Oferta', 'Si ponés acá un número mayor al Precio de Venta, la tienda mostrará automáticamente el precio viejo tachado y el cartelito rojo de % OFF. Completalo solo con el precio real al que vendías antes: un precio anterior falso puede considerarse publicidad engañosa.')">?</button>
+                </label>
+                <input type="number" id="prodComparePrice" class="form-control form-control-sm" min="0">
+              </div>
+            </div>
+            <div class="mb-2" id="simpleVariantsBlock">
+              <label class="form-label small fw-semibold mb-1">
+                Variantes / Talles / Sabores (Separadas por coma)
+                <button type="button" class="help-icon-btn" onclick="showHelp('Variantes del Producto', 'Escribí las opciones separadas por coma (ej: Talle S, Talle M, Talle L o Vainilla, Chocolate). Si el producto es único, dejalo vacío.')">?</button>
+              </label>
+              <input type="text" id="prodVariants" class="form-control form-control-sm" placeholder="Ej: Talle S, Talle M, Talle L">
+            </div>
+            <!-- Talles y colores con stock propio (se muestra si la tienda maneja variantes) -->
+            <div id="variantMatrixBlock" class="border rounded-3 p-2 mb-2 bg-light d-none">
+              <label class="form-label small fw-semibold mb-1">
+                Talles y colores con stock
+                <button type="button" class="help-icon-btn" onclick="showHelp('Talles y colores', 'Elegí los talles y escribí los colores separados por coma. Se arma una grilla donde cargás el stock de cada combinación. El stock total del producto es la suma de todas. Si el producto no tiene talles ni colores, elegí Sin talles y dejá los colores vacíos para usar un stock simple.')">?</button>
+              </label>
+              <div class="row g-2 mb-2">
+                <div class="col-6">
+                  <select id="varPreset" class="form-select form-select-sm">
+                    <option value="ropa">Ropa (XS a XXL)</option>
+                    <option value="calzado">Calzado (35 a 45)</option>
+                    <option value="custom">Talles personalizados</option>
+                    <option value="none">Sin talles</option>
+                  </select>
+                </div>
+                <div class="col-6">
+                  <input type="text" id="varColors" class="form-control form-control-sm" placeholder="Colores: Negro, Blanco">
+                </div>
+              </div>
+              <div class="mb-2 d-none" id="varCustomWrapper">
+                <input type="text" id="varCustomSizes" class="form-control form-control-sm" placeholder="Talles separados por coma, ej: 1, 2, 3 o Único">
+              </div>
+              <div id="varLegacyNote" class="alert alert-warning small py-1 px-2 mb-2 d-none">
+                Este producto tenía opciones sin stock propio. Cargá el stock de cada una antes de guardar.
+              </div>
+              <div id="variantGrid" class="table-responsive"></div>
+              <div class="small text-muted mt-1">Stock total: <strong id="varTotalStock">0</strong></div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label small fw-semibold mb-1">Descripción</label>
+              <textarea id="prodDesc" class="form-control form-control-sm" rows="2" required></textarea>
+            </div>
+            <div>
+              <label class="form-label small fw-semibold mb-1">Foto del Producto</label>
+              <input type="file" id="prodImageFile" class="form-control form-control-sm" accept="image/*">
+              <input type="hidden" id="prodImageUrl">
+              <div class="text-center mt-2">
+                <img id="imgPreview" src="" class="preview-upload-img d-none" alt="Vista previa">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer py-2">
+            <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-sm btn-primary fw-bold px-3" id="btnSaveProduct">Guardar Producto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="api.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

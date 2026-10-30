@@ -1,0 +1,584 @@
+/* ==========================================================================
+   1. TIPOGRAFÍA Y VARIABLES GLOBALES DINÁMICAS
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --primary-color: #2563eb;
+  --bg-body: #f4f6fb;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --card-radius: 16px;
+  --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  --fuente-principal: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --fuente-titulos: var(--fuente-principal);
+}
+
+body {
+  font-family: var(--fuente-principal);
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding-bottom: 80px;
+}
+
+/* ==========================================================================
+   2. UTILIDADES DE COLOR DINÁMICO
+   ========================================================================== */
+.bg-theme-primary {
+  background-color: var(--primary-color) !important;
+}
+
+.text-theme-primary {
+  color: var(--primary-color) !important;
+}
+
+.btn-theme-primary {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: var(--transition-smooth);
+}
+
+.btn-theme-primary:hover, .btn-theme-primary:active {
+  background-color: var(--primary-color);
+  filter: brightness(0.92);
+  color: #ffffff;
+}
+
+.btn-theme-primary:disabled {
+  background-color: #cbd5e1;
+  color: #64748b;
+}
+
+/* Botón oficial estilo Mercado Pago */
+.btn-mercadopago {
+  background-color: #009ee3;
+  color: #ffffff;
+  font-weight: 700;
+  border: none;
+  border-radius: 12px;
+  transition: var(--transition-smooth);
+}
+
+.btn-mercadopago:hover {
+  background-color: #008aca;
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   3. NAVBAR, CINTA DE CATEGORÍAS Y HERO BANNER
+   ========================================================================== */
+.announcement-bar {
+  background-color: #0f172a;
+  color: #f8fafc;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.navbar-glass {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+}
+
+.brand-logo-img {
+  height: 38px;
+  width: 38px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.category-scroll-wrapper {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.category-scroll-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.hero-banner {
+  position: relative;
+  min-height: 260px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.45) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 560px;
+}
+
+/* ==========================================================================
+   4. TARJETAS DE CONFIANZA Y PRODUCTOS
+   ========================================================================== */
+.trust-card {
+  background: #ffffff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  padding: 14px;
+}
+
+.trust-icon-box {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background-color: rgba(37, 99, 235, 0.08);
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.card-product {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  transition: var(--transition-smooth);
+}
+
+.card-product:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 26px -10px rgba(15, 23, 42, 0.08);
+}
+
+.product-img-wrapper {
+  position: relative;
+  height: 205px;
+  background-color: #f1f5f9;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.card-product:hover .product-img {
+  transform: scale(1.05);
+}
+
+.badge-discount {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #ef4444;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 4px 9px;
+  border-radius: 8px;
+}
+
+.badge-stock-out {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #94a3b8;
+  font-size: 0.82rem;
+}
+
+.variant-chip {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: var(--text-main);
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.variant-chip.active {
+  background-color: var(--primary-color);
+  color: #ffffff;
+  border-color: var(--primary-color);
+}
+
+/* ==========================================================================
+   5. PRE-FOOTER COMERCIAL INFORMATIVO (CONTACTO, HORARIOS Y REDES)
+   ========================================================================== */
+.pre-footer-section {
+  background-color: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 3rem;
+}
+
+.social-circle-link {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: #f1f5f9;
+  color: #0f172a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.social-circle-link:hover {
+  background-color: var(--primary-color);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   6. BARRAS MÓVILES Y PANEL ADMIN (BOTONES DE AYUDA ? Y WIZARD)
+   ========================================================================== */
+.mobile-cart-bar {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background-color: #0f172a;
+  color: #ffffff;
+  border-radius: 16px;
+  padding: 12px 18px;
+  z-index: 1025;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.whatsapp-float {
+  position: fixed;
+  bottom: 84px;
+  right: 18px;
+  width: 52px;
+  height: 52px;
+  background-color: #25d366;
+  color: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4);
+  z-index: 1020;
+  text-decoration: none;
+}
+
+/* Ícono circular de ayuda (?) interactivo */
+.help-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: #e2e8f0;
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 800;
+  border: none;
+  margin-left: 5px;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: var(--transition-smooth);
+}
+
+.help-icon-btn:hover {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+/* Tarjetas del Asistente de Rubros */
+.preset-macro-card {
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+  background: #ffffff;
+  transition: var(--transition-smooth);
+  height: 100%;
+}
+
+.preset-macro-card:hover {
+  border-color: #94a3b8;
+  transform: translateY(-2px);
+}
+
+.preset-macro-card.selected {
+  border-color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.05);
+}
+
+.admin-product-card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 14px;
+}
+
+.admin-product-card.paused-item {
+  opacity: 0.6;
+  background-color: #f8fafc;
+}
+
+.admin-thumb {
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.admin-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 68px;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1030;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.admin-nav-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 12px;
+}
+
+.admin-nav-btn i {
+  font-size: 1.25rem;
+  margin-bottom: 2px;
+}
+
+.admin-nav-btn.active {
+  color: #2563eb;
+  background-color: rgba(37, 99, 235, 0.08);
+}
+
+.preview-upload-img {
+  max-height: 130px;
+  border-radius: 10px;
+  object-fit: contain;
+  border: 1px dashed #cbd5e1;
+  padding: 4px;
+}
+
+/* ==========================================================================
+   7. HEADER FIJO, MENÚ LATERAL DE CATEGORÍAS Y TÍTULO DEL CATÁLOGO
+   ========================================================================== */
+.fw-extrabold {
+  font-weight: 800;
+}
+
+.site-brand {
+  min-width: 0;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 1.25rem;
+  text-decoration: none;
+  transition: var(--transition-smooth);
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  background-color: #f1f5f9;
+  color: var(--text-main);
+}
+
+/* Menú lateral oscuro de categorías */
+.menu-offcanvas {
+  --bs-offcanvas-width: 320px;
+  --bs-offcanvas-bg: #0f172a;
+  --bs-offcanvas-color: #f8fafc;
+  max-width: 85vw;
+}
+
+.menu-offcanvas .offcanvas-title {
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.menu-category-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-category-btn,
+.menu-link {
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(248, 250, 252, 0.12);
+  color: #f8fafc;
+  text-align: left;
+  padding: 16px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: var(--transition-smooth);
+}
+
+.menu-category-btn:hover,
+.menu-link:hover {
+  background-color: rgba(248, 250, 252, 0.06);
+}
+
+.menu-category-btn.active {
+  background-color: rgba(248, 250, 252, 0.1);
+  box-shadow: inset 3px 0 0 var(--primary-color);
+}
+
+.menu-link {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  border-bottom: none;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+/* Título del catálogo y selector de orden */
+.catalog-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.sort-select {
+  width: auto;
+  max-width: 170px;
+}
+
+/* Que el header fijo no tape las secciones al saltar con un enlace */
+#catalogoSection,
+#infoFooterSection {
+  scroll-margin-top: 72px;
+}
+
+/* ==========================================================================
+   8. CARTEL DE DEMO, TEXTOS LEGALES Y OPCIONES DEL CARRITO
+   ========================================================================== */
+.demo-banner {
+  background-color: #f59e0b;
+  color: #1f2937;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 6px 12px;
+}
+
+.footer-legal-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  text-decoration: underline;
+}
+
+.footer-legal-link:hover {
+  color: #ffffff;
+}
+
+.terms-box {
+  white-space: pre-wrap;
+  text-align: left;
+  font-size: 0.85rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+#transferInfo {
+  white-space: pre-line;
+}
+
+/* ==========================================================================
+   9. TIPOGRAFÍA ELEGIDA, ÍCONOS MATERIAL Y VARIANTES AGOTADAS
+   ========================================================================== */
+h1, h2, h3, h4, h5, h6,
+.offcanvas-title,
+.modal-title,
+.site-brand {
+  font-family: var(--fuente-titulos);
+}
+
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 1.25em;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  vertical-align: middle;
+  -webkit-font-feature-settings: 'liga';
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}
+
+.variant-chip.sold-out {
+  opacity: 0.45;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cargando tienda...</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- 0. CARTEL DE TIENDA DE DEMOSTRACIÓN (solo se ve si DEMO_MODE es true en api.js) -->
+  <div id="demoBanner" class="demo-banner d-none">
+    Tienda de demostración: los productos, precios y ofertas son de ejemplo. No se realizan ventas reales.
+  </div>
+
+  <!-- 1. BARRA SUPERIOR DE ANUNCIOS Y ESTADO DEL LOCAL -->
+  <div class="announcement-bar py-2 px-2">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span id="storeStatusBadge" class="badge rounded-pill bg-success">● Local Abierto</span>
+      <span id="announcementText" class="text-center flex-grow-1">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- 2. HEADER FIJO: MENÚ, MARCA, BÚSQUEDA, ADMIN Y CARRITO -->
+  <header class="site-header navbar-glass sticky-top">
+    <div class="container d-flex align-items-center gap-2 py-2">
+      <button class="icon-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#menuOffcanvas" aria-controls="menuOffcanvas" aria-label="Abrir menú de categorías">
+        <i class="bi bi-list"></i>
+      </button>
+
+      <a class="site-brand d-flex align-items-center gap-2 text-dark text-decoration-none" href="#">
+        <img id="navLogo" src="" alt="Logo" class="brand-logo-img d-none">
+        <span id="navBrandName" class="fw-extrabold fs-5 text-truncate">Tienda</span>
+      </a>
+
+      <div class="d-flex align-items-center gap-1 ms-auto">
+        <button class="icon-btn" type="button" data-bs-toggle="collapse" data-bs-target="#searchBar" aria-controls="searchBar" aria-expanded="false" aria-label="Buscar productos">
+          <i class="bi bi-search"></i>
+        </button>
+        <a href="admin.html" id="adminLink" class="icon-btn d-none" title="Admin" aria-label="Panel de administración">
+          <i class="bi bi-sliders"></i>
+        </a>
+        <button class="btn btn-theme-primary position-relative rounded-pill px-3 py-1 ms-1" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+          <i class="bi bi-bag-check-fill" id="cartBtnIcon"></i> <span class="d-none d-sm-inline ms-1">Carrito</span>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCounter">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Buscador desplegable (se abre con la lupa) -->
+    <div class="collapse" id="searchBar">
+      <div class="container pb-2">
+        <div class="input-group">
+          <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" id="searchInput" class="form-control bg-light border-start-0" placeholder="¿Qué estás buscando hoy?" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3. PORTADA / HERO BANNER -->
+  <section class="container mt-3">
+    <div class="hero-banner p-4 p-md-5 shadow-sm" id="heroBanner">
+      <div class="hero-overlay"></div>
+      <div class="hero-content text-white">
+        <span class="badge bg-theme-primary mb-2 px-3 py-1 rounded-pill">Catálogo Online</span>
+        <h1 class="fs-2 fw-extrabold mb-1" id="headerTitle">Bienvenido</h1>
+        <p class="small text-light opacity-90 mb-3" id="headerSlogan">Hacé tu pedido directo desde el celular</p>
+        <div class="d-flex gap-2 flex-wrap">
+          <a href="#catalogoSection" class="btn btn-light btn-sm fw-bold rounded-pill px-4 py-2">
+            Ver Productos <i class="bi bi-arrow-down-short"></i>
+          </a>
+          <a href="#infoFooterSection" class="btn btn-outline-light btn-sm fw-semibold rounded-pill px-3 py-2">
+            Horarios y Ubicación
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. BENEFICIOS RÁPIDOS -->
+  <section class="container my-3">
+    <div class="row g-2">
+      <div class="col-12 col-md-4">
+        <div class="trust-card d-flex align-items-center gap-3">
+          <div class="trust-icon-box"><i class="bi bi-truck"></i></div>
+          <div>
+            <h6 class="fw-bold mb-0 small" id="ben1Title">Envíos</h6>
+            <small class="text-muted" style="font-size:0.78rem;" id="ben1Desc">A domicilio o retiro</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4">
+        <div class="trust-card d-flex align-items-center gap-2">
+          <div class="trust-icon-box"><i class="bi bi-credit-card-2-front"></i></div>
+          <div>
+            <h6 class="fw-bold mb-0 small" id="ben2Title">Pagos</h6>
+            <small class="text-muted" style="font-size:0.75rem;" id="ben2Desc">Mercado Pago / Transf.</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4">
+        <div class="trust-card d-flex align-items-center gap-2">
+          <div class="trust-icon-box"><i class="bi bi-whatsapp"></i></div>
+          <div>
+            <h6 class="fw-bold mb-0 small" id="ben3Title">WhatsApp</h6>
+            <small class="text-muted" style="font-size:0.75rem;" id="ben3Desc">Atención directa</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. CATÁLOGO INTERACTIVO -->
+  <main class="container my-2 flex-grow-1" id="catalogoSection">
+    <div class="catalog-heading d-flex align-items-end justify-content-between gap-3 mb-3">
+      <div>
+        <h2 class="catalog-title mb-0" id="catalogTitle">Todos los productos</h2>
+        <small class="text-muted" id="catalogCount"></small>
+      </div>
+      <select id="sortSelect" class="form-select form-select-sm bg-white sort-select" aria-label="Ordenar productos">
+        <option value="recent">Más recientes</option>
+        <option value="price_asc">Menor precio</option>
+        <option value="price_desc">Mayor precio</option>
+      </select>
+    </div>
+
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2 g-md-4" id="catalogGrid"></div>
+  </main>
+
+  <!-- 6. MODAL DE PRODUCTO Y COMPARTIR -->
+  <div class="modal fade" id="quickViewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 overflow-hidden shadow">
+        <div class="row g-0">
+          <div class="col-md-6 bg-light d-flex align-items-center justify-content-center p-3">
+            <img id="qvImage" src="" class="img-fluid rounded-3" style="max-height: 300px; object-fit: cover;" alt="Producto">
+          </div>
+          <div class="col-md-6 p-4 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <span class="badge bg-light text-secondary border" id="qvCategory">Categoría</span>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <h5 class="fw-bold mb-1" id="qvTitle">Producto</h5>
+            <div class="d-flex align-items-baseline gap-2 mb-2">
+              <span class="fs-4 fw-extrabold text-theme-primary" id="qvPrice">$0</span>
+              <span class="old-price" id="qvOldPrice"></span>
+            </div>
+            <p class="text-muted small mb-3" id="qvDesc">Descripción</p>
+
+            <div id="qvVariantsSection" class="mb-3 d-none">
+              <label class="form-label small fw-bold mb-1">Seleccioná una opción:</label>
+              <div class="d-flex flex-wrap gap-2" id="qvVariantsList"></div>
+            </div>
+
+            <div class="mt-auto pt-3 border-top">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="small fw-semibold" id="qvStockBadge"></span>
+                <button class="btn btn-sm btn-light border rounded-pill px-3" id="qvShareBtn" title="Compartir producto">
+                  <i class="bi bi-share me-1"></i> Compartir
+                </button>
+              </div>
+              <button class="btn btn-theme-primary w-100 py-2" id="qvAddBtn">
+                <i class="bi bi-bag-plus me-1" id="qvAddIcon"></i> Agregar al Pedido
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6.1 MENÚ LATERAL DE CATEGORÍAS -->
+  <div class="offcanvas offcanvas-start menu-offcanvas" tabindex="-1" id="menuOffcanvas" aria-labelledby="menuOffcanvasLabel">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="menuOffcanvasLabel">Categorías</h5>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body pt-0">
+      <nav class="menu-category-list" id="categoriesContainer" aria-label="Categorías"></nav>
+      <button type="button" class="menu-link" onclick="closeMenuAndScroll('infoFooterSection')">
+        <i class="bi bi-geo-alt me-2"></i>Contacto e Info
+      </button>
+    </div>
+  </div>
+
+  <!-- 7. CARRITO LATERAL (CON CUPONES, ENVÍO Y MERCADO PAGO) -->
+  <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas">
+    <div class="offcanvas-header border-bottom py-3">
+      <h5 class="offcanvas-title fw-bold"><i class="bi bi-bag-check me-2 text-theme-primary" id="cartTitleIcon"></i>Tu Pedido</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column p-3">
+      <div id="cartItemsList" class="flex-grow-1 overflow-auto pe-1"></div>
+
+      <div class="border-top pt-3 mt-2 bg-light p-3 rounded-4">
+        <!-- Casillero de Cupón de Descuento -->
+        <div class="input-group input-group-sm mb-2" id="couponWrapper">
+          <input type="text" id="couponInput" class="form-control text-uppercase" placeholder="¿Tenés un código de cupón?">
+          <button class="btn btn-outline-secondary fw-semibold" type="button" id="btnApplyCoupon">Aplicar</button>
+        </div>
+
+        <div class="row g-2 mb-2">
+          <div class="col-6">
+            <label class="form-label small fw-bold mb-1">Entrega</label>
+            <select id="deliveryMethod" class="form-select form-select-sm">
+              <option value="pickup">Retiro en Local (Gratis)</option>
+              <option value="delivery">Envío a Domicilio</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label small fw-bold mb-1">Medio de Pago</label>
+            <select id="buyerPayment" class="form-select form-select-sm">
+              <option value="transfer">Transferencia / Efectivo</option>
+              <option value="mp">Mercado Pago / Tarjeta</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="payHint" class="small text-success fw-semibold mb-1 d-none"></div>
+        <div id="shipHint" class="small text-muted mb-1 d-none"></div>
+        <div id="transferInfo" class="alert alert-light border small py-2 mb-2 d-none"></div>
+
+        <div id="zoneWrapper" class="mb-2 d-none">
+          <label class="form-label small fw-bold mb-1" for="buyerZone">Zona de entrega</label>
+          <select id="buyerZone" class="form-select form-select-sm"></select>
+        </div>
+
+        <input type="text" id="buyerName" class="form-control form-control-sm mb-2" placeholder="Tu nombre y apellido *">
+        <input type="tel" id="buyerPhone" class="form-control form-control-sm mb-2" placeholder="Tu WhatsApp con código de área, ej: 11 2233 4455 *" inputmode="tel" autocomplete="tel">
+        <input type="text" id="buyerAddress" class="form-control form-control-sm mb-2 d-none" placeholder="Dirección exacta y localidad *">
+
+        <!-- Resumen de Costos -->
+        <div class="small border-top pt-2 mt-1">
+          <div class="d-flex justify-content-between text-muted">
+            <span>Subtotal:</span><span id="summarySubtotal">$0</span>
+          </div>
+          <div class="d-flex justify-content-between text-success fw-semibold d-none" id="summaryCouponRow">
+            <span id="couponLabel">Cupón:</span><span id="summaryCoupon">-$0</span>
+          </div>
+          <div class="d-flex justify-content-between text-success fw-semibold d-none" id="summaryDiscountRow">
+            <span id="discountLabel">Descuento pago:</span><span id="summaryDiscount">-$0</span>
+          </div>
+          <div class="d-flex justify-content-between text-muted d-none" id="summaryShippingRow">
+            <span>Costo de envío:</span><span id="summaryShipping">$0</span>
+          </div>
+          <div class="d-flex justify-content-between align-items-center mt-1 pt-1 border-top">
+            <span class="fw-bold fs-6" id="totalLabel">Total Final:</span>
+            <span class="fs-5 fw-extrabold text-theme-primary" id="cartTotalPrice">$0</span>
+          </div>
+        </div>
+
+        <!-- Botón de Pago con Mercado Pago (Opcional desde el Admin) -->
+        <button class="btn btn-mercadopago w-100 py-2 mt-2 d-none shadow-sm" id="btnPayMercadoPago">
+          <i class="bi bi-shield-check me-1"></i> Pagar con Mercado Pago
+        </button>
+
+        <!-- Botón de Confirmación por WhatsApp -->
+        <button class="btn btn-success w-100 fw-bold py-2 mt-2 rounded-3 shadow-sm" id="btnCheckoutWhatsapp">
+          <i class="bi bi-whatsapp me-1"></i> Enviar Pedido por WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. PRE-FOOTER COMERCIAL (CONTACTO, SOBRE NOSOTROS, HORARIOS Y PAGOS) -->
+  <section class="pre-footer-section py-5" id="infoFooterSection">
+    <div class="container">
+      <div class="row g-4">
+        <!-- Columna 1: Sobre el Negocio y Redes -->
+        <div class="col-md-4">
+          <h6 class="fw-extrabold text-uppercase mb-2" id="pfStoreName">Sobre Nosotros</h6>
+          <p class="text-muted small mb-3" id="pfAboutText">Descripción del comercio.</p>
+          <div class="d-flex gap-2">
+            <a href="#" target="_blank" id="pfInstagram" class="social-circle-link" title="Instagram"><i class="bi bi-instagram"></i></a>
+            <a href="#" target="_blank" id="pfFacebook" class="social-circle-link" title="Facebook"><i class="bi bi-facebook"></i></a>
+            <a href="#" target="_blank" id="pfWhatsappLink" class="social-circle-link" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+          </div>
+        </div>
+
+        <!-- Columna 2: Contacto, Dirección y Horarios -->
+        <div class="col-md-4">
+          <h6 class="fw-extrabold text-uppercase mb-2">Contacto y Ubicación</h6>
+          <ul class="list-unstyled small text-muted mb-0 d-flex flex-column gap-2">
+            <li><i class="bi bi-geo-alt-fill text-theme-primary me-2"></i><span id="pfAddress">Dirección del local</span></li>
+            <li><i class="bi bi-clock-fill text-theme-primary me-2"></i><span id="pfHours">Horarios de atención</span></li>
+            <li><i class="bi bi-whatsapp text-success me-2"></i><span id="pfPhone">WhatsApp directo</span></li>
+          </ul>
+        </div>
+
+        <!-- Columna 3: Medios de Pago y Envíos -->
+        <div class="col-md-4">
+          <h6 class="fw-extrabold text-uppercase mb-2">Información Útil</h6>
+          <p class="small text-muted mb-2" id="pfPaymentsText"></p>
+          <div class="d-flex flex-wrap gap-2" id="pfBadges"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. BARRA FLOTANTE MÓVIL Y WHATSAPP -->
+  <div id="mobileCartBar" class="mobile-cart-bar d-none" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-theme-primary rounded-pill px-2 py-1" id="mobileBarCount">0</span>
+      <span class="fw-bold small">Ver mi pedido</span>
+    </div>
+    <span class="fw-extrabold fs-6" id="mobileBarTotal">$0</span>
+  </div>
+
+  <a href="#" target="_blank" id="floatingWhatsapp" class="whatsapp-float" title="Consultar por WhatsApp">
+    <i class="bi bi-whatsapp"></i>
+  </a>
+
+  <!-- 10. PIE DE PÁGINA FINAL -->
+  <footer class="bg-dark text-white py-3">
+    <div class="container text-center small text-secondary">
+      <div id="legalInfo" class="mb-2 d-none"></div>
+      <div class="d-flex flex-wrap justify-content-center gap-3 mb-2">
+        <button type="button" class="footer-legal-link" onclick="showTerms()">Términos y condiciones</button>
+        <button type="button" class="footer-legal-link" onclick="openWithdrawalForm()">Botón de arrepentimiento</button>
+      </div>
+      <strong class="text-white" id="footerStoreName">Tienda</strong> &copy; <span id="footerYear">2026</span> - Todos los derechos reservados.
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="api.js"></script>
+  <script src="tienda.js"></script>
+</body>
+</html>
